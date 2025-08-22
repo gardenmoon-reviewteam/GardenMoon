@@ -92,18 +92,21 @@ body {
 }
 
 .badge-active {
-    background-color: var(--success-color);
+    background: linear-gradient(45deg, #0d6efd, #0b5ed7, #0d6efd);
+    background-size: 200% 200%;
     color: white;
     font-weight: 600;
     padding: 0.5rem 0.75rem;
     border-radius: 20px;
-    box-shadow: 0 2px 4px rgba(25, 135, 84, 0.3);
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.3);
+    animation: activePulse 3s ease-in-out infinite;
     transition: all 0.3s ease;
 }
 
 .badge-active:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(25, 135, 84, 0.4);
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.4);
+    animation: activePulse 1.5s ease-in-out infinite;
 }
 
 .badge-paused {
@@ -222,6 +225,21 @@ body {
     100% {
         background-position: 0% 50%;
         box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3);
+    }
+}
+
+@keyframes activePulse {
+    0% {
+        background-position: 0% 50%;
+        box-shadow: 0 2px 4px rgba(13, 110, 253, 0.3);
+    }
+    50% {
+        background-position: 100% 50%;
+        box-shadow: 0 2px 8px rgba(13, 110, 253, 0.6);
+    }
+    100% {
+        background-position: 0% 50%;
+        box-shadow: 0 2px 4px rgba(13, 110, 253, 0.3);
     }
 }
 
