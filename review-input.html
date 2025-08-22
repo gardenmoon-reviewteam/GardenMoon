@@ -1,1 +1,832 @@
 <!doctypehtml><html lang=vi><meta charset=UTF-8><meta content="width=device-width,initial-scale=1"name=viewport><title>Nhập nội dung Task Review - Garden Moon</title><link href=https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css rel=stylesheet><link href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css rel=stylesheet><link href=styles.css rel=stylesheet><style>.review-input-container{max-width:1000px;margin:0 auto;padding:20px}.task-info-card{background:linear-gradient(135deg,#667eea 0,#764ba2 100%);color:#fff;border-radius:15px;padding:20px;margin-bottom:30px}.content-editor{border:2px solid #e9ecef;border-radius:10px;min-height:400px;padding:20px;font-family:'Courier New',monospace;font-size:14px;line-height:1.6;resize:vertical}.content-editor:focus{border-color:#007bff;box-shadow:0 0 0 .2rem rgba(0,123,255,.25)}.word-count{background:#f8f9fa;border-radius:5px;padding:10px;margin-top:10px;font-size:12px;color:#6c757d}.save-btn{background:linear-gradient(135deg,#28a745,#20c997);border:none;border-radius:25px;padding:12px 30px;font-weight:600;transition:all .3s ease}.save-btn:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(40,167,69,.4)}.back-btn{background:linear-gradient(135deg,#6c757d,#495057);border:none;border-radius:25px;padding:12px 30px;font-weight:600;transition:all .3s ease}.back-btn:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(108,117,125,.4)}.status-badge{font-size:12px;padding:5px 10px;border-radius:15px}.loading-spinner{display:none}.loading-spinner.show{display:inline-block}.readonly-mode .content-editor{background-color:#f8f9fa;border-color:#dee2e6;cursor:not-allowed}.readonly-mode .text-toolbar{opacity:.5;pointer-events:none}.text-toolbar{background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:15px;margin-bottom:15px}.text-toolbar .form-group{margin-bottom:10px}.text-toolbar label{font-weight:600;font-size:12px;color:#495057;margin-bottom:5px}.text-toolbar input,.text-toolbar select{font-size:12px}.toolbar-row{display:flex;gap:15px;align-items:end;flex-wrap:wrap}.toolbar-item{flex:1;min-width:120px}.action-buttons{display:flex;gap:10px;flex-wrap:wrap}.action-btn{padding:6px 12px;font-size:12px;border-radius:5px}.readonly-mode{background-color:#f8f9fa;opacity:.8}.readonly-mode .content-editor{pointer-events:none}.readonly-mode .text-toolbar{opacity:.6;pointer-events:none}</style><nav class="bg-primary navbar navbar-dark navbar-expand-lg"><div class=container><a class=navbar-brand href=index.html><i class="fas me-2 fa-arrow-left"></i> Quay lại Bảng DL</a><div class="ms-auto navbar-nav"><span id=currentUserInfo class=navbar-text><i class="fas me-1 fa-user"></i> <span id=currentUserName>Đang tải...</span></span></div></div></nav><div class=review-input-container><div class=task-info-card id=taskInfoCard><div class=row><div class=col-md-8><h4 id=taskName>Đang tải thông tin...</h4><p class=mb-2 id=taskDescription>Mô tả: <span id=taskDescText>-</span><div class=row><div class=col-md-4><small><i class="fas me-1 fa-calendar"></i> Deadline: <span id=taskDeadline>-</span></small></div><div class=col-md-4><small><i class="fas me-1 fa-user"></i> Người thực hiện: <span id=taskAssignee>-</span></small></div><div class=col-md-4><small><i class="fas me-1 fa-info-circle"></i> Trạng thái: <span id=taskStatus>-</span></small></div></div></div><div class="col-md-4 text-end"><span id=taskStatusBadge class="bg-light status-badge text-dark">-</span></div></div></div><div class=card><div class=card-header><h5 class=mb-0><i class="fas me-2 fa-paint-brush"></i> Công cụ chỉnh sửa văn bản</h5></div><div class=card-body><div class=text-toolbar id=textToolbar><div class=toolbar-row><div class=toolbar-item><label for=fontFamily>Font chữ:</label> <select class="form-control form-control-sm"id=fontFamily><option value="Arial, sans-serif">Arial<option value="Times New Roman, serif">Times New Roman<option value="Courier New, monospace"selected>Courier New<option value="Georgia, serif">Georgia<option value="Verdana, sans-serif">Verdana<option value="Tahoma, sans-serif">Tahoma<option value="Trebuchet MS, sans-serif">Trebuchet MS<option value="Impact, sans-serif">Impact</select></div><div class=toolbar-item><label for=fontSize>Cỡ chữ:</label> <select class="form-control form-control-sm"id=fontSize><option value=12>12px<option value=14 selected>14px<option value=16>16px<option value=18>18px<option value=20>20px<option value=24>24px<option value=28>28px<option value=32>32px</select></div><div class=toolbar-item><label for=lineHeight>Khoảng cách dòng:</label> <select class="form-control form-control-sm"id=lineHeight><option value=1.2>1.2<option value=1.4>1.4<option value=1.6 selected>1.6<option value=1.8>1.8<option value=2.0>2.0</select></div></div><div class=toolbar-row><div class=toolbar-item><label>Chức năng:</label><div class=action-buttons><button class="btn action-btn btn-outline-primary"onclick=splitByPeriods()><i class="fas me-1 fa-cut"></i>Tách dòng</button> <button class="btn action-btn btn-outline-info"onclick=formatText()><i class="fas me-1 fa-magic"></i>Định dạng</button> <button class="btn action-btn btn-outline-secondary"onclick=clearFormatting()><i class="fas me-1 fa-eraser"></i>Gộp dòng</button></div></div></div></div></div></div><div class=card><div class="card-header align-items-center d-flex justify-content-between"><h5 class=mb-0><i class="fas me-2 fa-edit"></i> <span id=contentTitle>Nội dung Review</span></h5><div id=editModeIndicator><span id=modeBadge class="badge bg-info">Chế độ nhập</span></div></div><div class=card-body><textarea class="form-control content-editor"id=reviewContent placeholder="Nhập nội dung task review tại đây..."rows=20></textarea><div class=word-count><i class="fas me-1 fa-text-width"></i> Số ký tự: <span id=charCount>0</span> | Số từ: <span id=wordCount>0</span> | Số dòng: <span id=lineCount>0</span></div></div></div><div class="d-flex justify-content-between mt-4"><button class="btn back-btn"onclick=goBack()><i class="fas me-2 fa-arrow-left"></i> Quay lại</button><div><button class="me-2 btn btn-outline-secondary"onclick=clearContent()><i class="fas me-2 fa-eraser"></i> Xóa nội dung</button> <button class="btn save-btn"id=saveButton><i class="fas me-2 fa-save"></i> <span id=saveBtnText>Lưu nội dung</span> <span id=saveSpinner class=loading-spinner><i class="fas fa-spin fa-spinner"></i></span></button></div></div></div><div class="bottom-0 end-0 p-3 position-fixed toast-container"><div class=toast id=notificationToast role=alert><div class=toast-header><strong class=me-auto id=toastTitle>Thông báo</strong> <button class=btn-close data-bs-dismiss=toast type=button></button></div><div class=toast-body id=toastMessage></div></div></div><script src=https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js></script><script src=https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2></script><script>// Supabase Configuration
+        const SUPABASE_URL = 'https://blkkgtjsebkjmhqqtrwh.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsa2tndGpzZWJram1ocXF0cndoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5Mzc5NDgsImV4cCI6MjA2OTUxMzk0OH0.0VQIXPP5ZfpeFzDpG-lGVFqwZNikn5rb-vQTu5AdUTs'
+        
+        // Kiểm tra xem Supabase đã được load chưa
+        if (!window.supabase) {
+            console.error('❌ Supabase library not loaded!')
+            document.addEventListener('DOMContentLoaded', function() {
+                showNotification('Lỗi: Supabase library chưa được tải', 'error')
+            })
+        }
+        
+        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null
+        
+        // Global variables
+        let currentUser = null
+        let currentTask = null
+        let taskId = null
+        let mode = 'input' // 'input' hoặc 'edit'
+        let betaTaskInfo = null // Thông tin về beta task nếu có
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== DOM CONTENT LOADED ===')
+            console.log('Supabase URL:', SUPABASE_URL)
+            console.log('Supabase Key (first 20 chars):', SUPABASE_ANON_KEY.substring(0, 20) + '...')
+            console.log('Supabase client created:', !!supabase)
+            
+            // Test Supabase connection
+            if (supabase) {
+                console.log('✅ Supabase client created successfully')
+                // Test a simple query
+                supabase.from('tasks').select('count').limit(1).then(result => {
+                    console.log('✅ Supabase connection test:', result)
+                }).catch(error => {
+                    console.error('❌ Supabase connection test failed:', error)
+                })
+            } else {
+                console.error('❌ Failed to create Supabase client')
+            }
+            
+            initializePage()
+        })
+        
+        async function initializePage() {
+            console.log('=== INITIALIZING PAGE ===')
+            
+            // Kiểm tra Supabase client
+            if (!supabase) {
+                console.error('❌ Supabase client is null!')
+                showNotification('Lỗi: Không thể kết nối Supabase', 'error')
+                return
+            }
+            
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search)
+            taskId = urlParams.get('taskId')
+            mode = urlParams.get('mode') || 'input'
+            
+            // Lấy thông tin beta task nếu có
+            const betaTaskId = urlParams.get('betaTaskId')
+            const betaTaskAssignee = urlParams.get('betaTaskAssignee')
+            
+            console.log('=== URL PARAMETERS ===')
+            console.log('Full URL:', window.location.href)
+            console.log('Task ID:', taskId)
+            console.log('Mode:', mode)
+            console.log('Beta Task ID:', betaTaskId)
+            console.log('Beta Task Assignee:', betaTaskAssignee)
+            console.log('========================')
+            
+            if (betaTaskId && betaTaskAssignee) {
+                betaTaskInfo = {
+                    id: betaTaskId,
+                    assignee_id: betaTaskAssignee
+                }
+                console.log('✅ Beta task info loaded from URL:', betaTaskInfo)
+            } else {
+                console.log('❌ No beta task info found in URL')
+                console.log('This might be the issue!')
+            }
+            
+            if (!taskId) {
+                showNotification('Không tìm thấy thông tin task', 'error')
+                setTimeout(() => goBack(), 2000)
+                return
+            }
+            
+            // Cập nhật tiêu đề trang theo mode
+            updatePageTitle()
+            
+            // Check authentication
+            await checkAuthentication()
+            
+            // Load task information
+            await loadTaskInfo()
+            
+            // Setup event listeners
+            setupEventListeners()
+            
+            // Apply initial text formatting
+            applyTextFormatting()
+        }
+        
+        async function checkAuthentication() {
+            console.log('=== CHECKING AUTHENTICATION ===')
+            // Get user from localStorage (from main page)
+            const savedUser = localStorage.getItem('currentUser')
+            console.log('Saved user from localStorage:', savedUser ? 'Found' : 'Not found')
+            
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser)
+                console.log('Current user loaded:', currentUser)
+                document.getElementById('currentUserName').textContent = currentUser.name
+            } else {
+                console.log('❌ No user found in localStorage')
+                showNotification('Vui lòng đăng nhập từ trang chính', 'error')
+                setTimeout(() => goBack(), 2000)
+                return
+            }
+        }
+        
+        async function loadTaskInfo() {
+            console.log('=== LOADING TASK INFO ===')
+            console.log('Task ID to load:', taskId)
+            
+            try {
+                console.log('Attempting to connect to Supabase...')
+                
+                // Kiểm tra xem taskId có hợp lệ không
+                if (!taskId || isNaN(parseInt(taskId))) {
+                    throw new Error('Task ID không hợp lệ: ' + taskId)
+                }
+                
+                console.log('Task ID is valid, proceeding with query...')
+                
+                // Get task information
+                const { data: taskData, error } = await supabase
+                    .from('tasks')
+                    .select(`
+                        *,
+                        project:projects(name, status),
+                        assignee:employees(name)
+                    `)
+                    .eq('id', parseInt(taskId))
+                    .single()
+                
+                console.log('Supabase response:', { data: taskData, error })
+                
+                if (error) {
+                    console.error('Supabase error:', error)
+                    throw error
+                }
+                
+                if (!taskData) {
+                    throw new Error('Không tìm thấy task với ID: ' + taskId)
+                }
+                
+                currentTask = taskData
+                
+                console.log('=== TASK INFO LOADED ===')
+                console.log('Task ID:', currentTask.id)
+                console.log('Task Name:', currentTask.name)
+                console.log('Task Type:', currentTask.task_type)
+                console.log('Task Assignee ID:', currentTask.assignee_id)
+                console.log('Mode:', mode)
+                console.log('Beta Task Info:', betaTaskInfo)
+                console.log('Current User ID:', currentUser?.id)
+                console.log('============================')
+                
+                        // Check permissions
+        const hasAccess = canAccessTask(currentTask)
+        const canViewReview = mode === 'view' ? canViewReviewContent(currentTask) : 'N/A'
+        
+        console.log('=== ACCESS CHECK RESULT ===')
+        console.log('Task ID:', currentTask.id)
+        console.log('Task Name:', currentTask.name)
+        console.log('Task Type:', currentTask.task_type)
+        console.log('Task Assignee ID:', currentTask.assignee_id)
+        console.log('Current User ID:', currentUser?.id)
+        console.log('Current User Role:', currentUser?.role)
+        console.log('Mode:', mode)
+        console.log('Beta Task Info:', betaTaskInfo)
+        console.log('Has Access:', hasAccess)
+        console.log('Can View Review:', canViewReview)
+        console.log('Final Result:', hasAccess ? '✅ ACCESS GRANTED' : '❌ ACCESS DENIED')
+        console.log('================================')
+        
+        if (!hasAccess) {
+            showNotification('Bạn không có quyền truy cập task này', 'error')
+            // Tắt logic thoát trang để debug
+            // setTimeout(() => goBack(), 2000)
+            // return
+            console.log('ACCESS DENIED - but staying on page for debugging')
+        }
+        
+        // Update UI with task information
+        updateTaskInfoUI(currentTask)
+        
+        // Load existing content if in edit mode or view mode
+        if ((mode === 'edit' || mode === 'view') && currentTask.submission_link) {
+            await loadExistingContent()
+        }
+        
+        // Set edit mode based on permissions
+        setEditMode()
+                
+            } catch (error) {
+                console.error('Error loading task info:', error)
+                
+                // Hiển thị thông báo lỗi chi tiết hơn
+                let errorMessage = 'Lỗi tải thông tin task'
+                if (error.message) {
+                    errorMessage += ': ' + error.message
+                }
+                
+                showNotification(errorMessage, 'error')
+                
+                // Cập nhật UI để hiển thị lỗi
+                document.getElementById('taskName').textContent = 'Lỗi tải thông tin'
+                document.getElementById('taskDescText').textContent = 'Không thể kết nối database'
+                document.getElementById('taskDeadline').textContent = 'N/A'
+                document.getElementById('taskAssignee').textContent = 'N/A'
+                document.getElementById('taskStatus').textContent = 'N/A'
+                document.getElementById('taskStatusBadge').textContent = 'Lỗi'
+                document.getElementById('taskStatusBadge').className = 'status-badge bg-danger'
+            }
+        }
+        
+        function canAccessTask(task) {
+            console.log('=== canAccessTask called ===')
+            console.log('Current User:', currentUser)
+            console.log('Task:', task)
+            console.log('Mode:', mode)
+            console.log('Beta Task Info:', betaTaskInfo)
+            
+            if (!currentUser) {
+                console.log('No current user - returning false')
+                return false
+            }
+            
+            // Boss và Manager có thể truy cập mọi task
+            if (currentUser.role === 'boss' || currentUser.role === 'manager') {
+                console.log('User is Boss/Manager - returning true')
+                return true
+            }
+            
+            // Employee chỉ có thể truy cập task được phân công cho mình
+            if (currentUser.role === 'employee') {
+                console.log('User is Employee - checking permissions...')
+                
+                // Nếu là mode view và có thông tin beta task, kiểm tra quyền xem review content
+                if (mode === 'view' && betaTaskInfo) {
+                    console.log('Mode is view and has beta task info - calling canViewReviewContent')
+                    const result = canViewReviewContent(task)
+                    console.log('canViewReviewContent result:', result)
+                    return result
+                }
+                
+                // Nếu không phải mode view, kiểm tra quyền chỉnh sửa (task được phân công cho mình)
+                const isAssignee = task.assignee_id === currentUser.id
+                console.log('Checking if user is assignee:', {
+                    taskAssigneeId: task.assignee_id,
+                    currentUserId: currentUser.id,
+                    isAssignee: isAssignee
+                })
+                return isAssignee
+            }
+            
+            console.log('User role not recognized - returning false')
+            return false
+        }
+        
+        // Function kiểm tra quyền xem review content (cho mode view)
+        function canViewReviewContent(task) {
+            console.log('=== canViewReviewContent called ===')
+            console.log('Task:', task)
+            console.log('Current User:', currentUser)
+            console.log('Mode:', mode)
+            console.log('Beta Task Info:', betaTaskInfo)
+            
+            if (!currentUser) {
+                console.log('No current user - returning false')
+                return false
+            }
+            
+            // Boss và Manager có thể xem mọi task
+            if (currentUser.role === 'boss' || currentUser.role === 'manager') {
+                console.log('Permission granted: Boss/Manager - returning true')
+                return true
+            }
+            
+            // Employee chỉ có thể xem review content nếu được phân công task beta tương ứng
+            if (currentUser.role === 'employee') {
+                console.log('User is Employee - checking beta task permissions...')
+                console.log('Current User ID:', currentUser.id)
+                
+                // Nếu có thông tin beta task từ URL parameters, sử dụng trực tiếp
+                if (betaTaskInfo && betaTaskInfo.assignee_id === currentUser.id) {
+                    console.log('✅ Permission granted via URL parameters:', {
+                        currentUser: currentUser.id,
+                        betaTaskAssignee: betaTaskInfo.assignee_id,
+                        betaTaskId: betaTaskInfo.id
+                    })
+                    return true
+                }
+                
+                console.log('❌ No permission via URL parameters, checking fallback...')
+                console.log('Beta Task Info check:', {
+                    hasBetaTaskInfo: !!betaTaskInfo,
+                    betaTaskInfo: betaTaskInfo,
+                    betaTaskAssignee: betaTaskInfo?.assignee_id,
+                    currentUserId: currentUser.id,
+                    match: betaTaskInfo?.assignee_id === currentUser.id
+                })
+                
+                // Fallback: Tìm task beta có parent_task_id trỏ đến task review này
+                // Lấy tasks từ localStorage hoặc window object
+                let betaTasks = []
+                try {
+                    // Thử lấy từ window object trước (nếu được truyền từ trang chính)
+                    if (window.tasks && Array.isArray(window.tasks)) {
+                        betaTasks = window.tasks
+                        console.log('Using window.tasks:', betaTasks.length)
+                    } else {
+                        // Nếu không có, thử lấy từ localStorage
+                        const savedTasks = localStorage.getItem('tasks')
+                        if (savedTasks) {
+                            betaTasks = JSON.parse(savedTasks)
+                            console.log('Using localStorage tasks:', betaTasks.length)
+                        } else {
+                            console.log('No tasks found in localStorage')
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Error loading tasks for permission check:', error)
+                }
+                
+                // Tìm task beta có parent_task_id trỏ đến task review này
+                const relatedBetaTask = betaTasks.find(t => 
+                    t.task_type === 'beta' && 
+                    t.parent_task_id === task.id && 
+                    t.assignee_id === currentUser.id
+                )
+                
+                console.log('Fallback permission check:', {
+                    currentUser: currentUser.id,
+                    reviewTaskId: task.id,
+                    betaTasks: betaTasks.length,
+                    relatedBetaTask: relatedBetaTask,
+                    hasPermission: !!relatedBetaTask,
+                    betaTaskInfo: betaTaskInfo
+                })
+                
+                if (relatedBetaTask) {
+                    console.log('✅ Permission granted via fallback method')
+                } else {
+                    console.log('❌ No permission via fallback method')
+                }
+                
+                return !!relatedBetaTask
+            }
+            
+            console.log('No permission: user is not employee - returning false')
+            return false
+        }
+        
+        function setEditMode() {
+            const canEdit = canEditTask()
+            const canView = mode === 'view' ? canViewReviewContent(currentTask) : false
+            const container = document.querySelector('.review-input-container')
+            const contentEditor = document.getElementById('reviewContent')
+            const textToolbar = document.getElementById('textToolbar')
+            const saveButton = document.getElementById('saveButton')
+            const modeBadge = document.getElementById('modeBadge')
+            const contentTitle = document.getElementById('contentTitle')
+            
+            if (mode === 'view') {
+                // Kiểm tra quyền xem trước
+                if (!canView) {
+                    showNotification('Bạn không có quyền xem nội dung review này', 'error')
+                    // Tắt logic thoát trang để debug
+                    // setTimeout(() => goBack(), 2000)
+                    // return
+                    console.log('VIEW PERMISSION DENIED - but staying on page for debugging')
+                }
+                
+                // Mode xem: chỉ hiển thị nội dung, không cho phép chỉnh sửa
+                container.classList.add('readonly-mode')
+                contentEditor.readOnly = true
+                textToolbar.style.pointerEvents = 'none'
+                textToolbar.style.opacity = '0.5'
+                saveButton.style.display = 'none'
+                
+                modeBadge.textContent = 'Chế độ xem'
+                modeBadge.className = 'badge bg-secondary'
+                contentTitle.textContent = 'Xem nội dung Review'
+                
+                // Thêm nút copy content
+                addCopyButton()
+                
+            } else if (canEdit) {
+                // Mode chỉnh sửa hoặc nhập
+                container.classList.remove('readonly-mode')
+                contentEditor.readOnly = false
+                textToolbar.style.pointerEvents = 'auto'
+                textToolbar.style.opacity = '1'
+                saveButton.style.display = 'inline-block'
+                
+                if (mode === 'edit') {
+                    modeBadge.textContent = 'Chế độ chỉnh sửa'
+                    modeBadge.className = 'badge bg-warning'
+                    contentTitle.textContent = 'Chỉnh sửa nội dung Review'
+                } else {
+                    modeBadge.textContent = 'Chế độ nhập'
+                    modeBadge.className = 'badge bg-info'
+                    contentTitle.textContent = 'Nhập nội dung Review'
+                }
+            } else {
+                // Không có quyền chỉnh sửa - chuyển về trang chính
+                showNotification('Bạn không có quyền truy cập nội dung này', 'error')
+                // Tắt logic thoát trang để debug
+                // setTimeout(() => goBack(), 2000)
+                console.log('EDIT PERMISSION DENIED - but staying on page for debugging')
+            }
+        }
+        
+        function canEditTask() {
+            if (!currentUser || !currentTask) return false
+            
+            // Boss và Manager có thể chỉnh sửa mọi task
+            if (currentUser.role === 'boss' || currentUser.role === 'manager') {
+                return true
+            }
+            
+            // Employee chỉ có thể chỉnh sửa task được phân công cho mình
+            if (currentUser.role === 'employee') {
+                return currentTask.assignee_id === currentUser.id
+            }
+            
+            return false
+        }
+        
+        function updateTaskInfoUI(task) {
+            document.getElementById('taskName').textContent = task.name
+            document.getElementById('taskDescText').textContent = task.description || 'Không có mô tả'
+            document.getElementById('taskDeadline').textContent = formatDateTime(task.deadline)
+            document.getElementById('taskAssignee').textContent = task.assignee ? task.assignee.name : 'Chưa phân công'
+            document.getElementById('taskStatus').textContent = getStatusText(task.status)
+            document.getElementById('taskStatusBadge').textContent = getStatusText(task.status)
+            
+            // Update status badge color
+            const statusBadge = document.getElementById('taskStatusBadge')
+            statusBadge.className = 'status-badge ' + getStatusBadgeClass(task.status)
+        }
+        
+        async function loadExistingContent() {
+            try {
+                // Thử đọc nội dung từ bảng task_content trước
+                const { data: contentData, error: contentError } = await supabase
+                    .from('task_content')
+                    .select('content')
+                    .eq('task_id', parseInt(taskId)) // Đảm bảo task_id là INTEGER
+                    .eq('content_type', 'review')
+                    .single()
+                
+                if (contentData && contentData.content) {
+                    // Nếu có nội dung trong task_content, sử dụng nó
+                    document.getElementById('reviewContent').value = contentData.content
+                    updateWordCount()
+                    return
+                }
+                
+                // Fallback: kiểm tra submission_link cũ (backward compatibility)
+                if (currentTask.submission_link) {
+                    // Check if submission_link is a URL or direct content
+                    if (currentTask.submission_link.startsWith('http')) {
+                        try {
+                            // Try to fetch from URL (for external links)
+                            const response = await fetch(currentTask.submission_link)
+                            if (response.ok) {
+                                const content = await response.text()
+                                document.getElementById('reviewContent').value = content
+                            } else {
+                                // If fetch fails, treat as direct content
+                                document.getElementById('reviewContent').value = currentTask.submission_link
+                            }
+                        } catch (fetchError) {
+                            console.warn('Failed to fetch from URL, treating as direct content:', fetchError)
+                            // If fetch fails (CORS, network error, etc.), treat as direct content
+                            document.getElementById('reviewContent').value = currentTask.submission_link
+                        }
+                    } else if (currentTask.submission_link !== '[CONTENT_SAVED]') {
+                        // If it's direct content (not a URL and not the marker)
+                        document.getElementById('reviewContent').value = currentTask.submission_link
+                    }
+                    updateWordCount()
+                }
+            } catch (error) {
+                console.error('Error loading existing content:', error)
+                showNotification('Lỗi tải nội dung hiện tại', 'error')
+            }
+        }
+        
+        function setupEventListeners() {
+            console.log('=== SETTING UP EVENT LISTENERS ===')
+            
+            // Word count update
+            const contentEditor = document.getElementById('reviewContent')
+            console.log('Content editor found:', !!contentEditor)
+            contentEditor.addEventListener('input', updateWordCount)
+            
+            // Auto-save draft (optional)
+            contentEditor.addEventListener('input', debounce(autoSaveDraft, 30000)) // Auto-save every 30 seconds
+            
+            // Text formatting event listeners
+            document.getElementById('fontFamily').addEventListener('change', applyTextFormatting)
+            document.getElementById('fontSize').addEventListener('change', applyTextFormatting)
+            document.getElementById('lineHeight').addEventListener('change', applyTextFormatting)
+            
+            // Save button event listener
+            const saveButton = document.getElementById('saveButton')
+            console.log('Save button found:', !!saveButton)
+            if (saveButton) {
+                saveButton.addEventListener('click', saveReviewContent)
+                console.log('✅ Event listener added to save button')
+                
+                // Test click event
+                console.log('Testing save button click...')
+                saveButton.addEventListener('click', () => {
+                    console.log('🎯 Save button clicked!')
+                })
+            } else {
+                console.error('❌ Save button not found!')
+            }
+        }
+        
+        function applyTextFormatting() {
+            const contentEditor = document.getElementById('reviewContent')
+            const fontFamily = document.getElementById('fontFamily').value
+            const fontSize = document.getElementById('fontSize').value
+            const lineHeight = document.getElementById('lineHeight').value
+            
+            contentEditor.style.fontFamily = fontFamily
+            contentEditor.style.fontSize = fontSize + 'px'
+            contentEditor.style.lineHeight = lineHeight
+        }
+        
+        function updateWordCount() {
+            const content = document.getElementById('reviewContent').value
+            const charCount = content.length
+            const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0
+            const lineCount = content.split('\n').length
+            
+            document.getElementById('charCount').textContent = charCount.toLocaleString()
+            document.getElementById('wordCount').textContent = wordCount.toLocaleString()
+            document.getElementById('lineCount').textContent = lineCount.toLocaleString()
+        }
+        
+        function splitByPeriods() {
+            const contentEditor = document.getElementById('reviewContent')
+            let content = contentEditor.value
+            
+            // Split content by periods, remove spaces before newlines, and join with newlines
+            content = content.replace(/\.\s*/g, '.\n')
+            
+            // Remove extra newlines
+            content = content.replace(/\n\s*\n/g, '\n')
+            
+            contentEditor.value = content
+            updateWordCount()
+            showNotification('Đã tách dòng theo dấu chấm', 'success')
+        }
+        
+        function formatText() {
+            const contentEditor = document.getElementById('reviewContent')
+            let content = contentEditor.value
+            
+            // Capitalize first letter after periods
+            content = content.replace(/\.\s*([a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ])/gi, (match, letter) => {
+                return '. ' + letter.toUpperCase()
+            })
+            
+            // Capitalize first letter at the beginning of lines
+            content = content.replace(/^([a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ])/gm, (match, letter) => {
+                return letter.toUpperCase()
+            })
+            
+            // Add periods at the end of sentences if missing
+            content = content.replace(/([a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ])\s*$/gm, '$1.')
+            
+            // Basic text formatting
+            content = content
+                .replace(/\s+/g, ' ') // Remove extra spaces
+                .replace(/\n\s*\n/g, '\n\n') // Normalize line breaks
+                .replace(/^\s+|\s+$/gm, '') // Trim lines
+                .replace(/\.\s*\./g, '.') // Remove double periods
+                .replace(/,\s*,/g, ',') // Remove double commas
+            
+            contentEditor.value = content
+            updateWordCount()
+            showNotification('Đã định dạng văn bản', 'success')
+        }
+        
+        function clearFormatting() {
+            const contentEditor = document.getElementById('reviewContent')
+            let content = contentEditor.value
+            
+            // Remove all formatting
+            content = content
+                .replace(/\s+/g, ' ') // Normalize spaces
+                .replace(/\n+/g, '\n') // Normalize line breaks
+                .trim()
+            
+            contentEditor.value = content
+            updateWordCount()
+            showNotification('Đã gộp dòng', 'success')
+        }
+        
+        async function saveReviewContent() {
+            console.log('=== saveReviewContent called ===')
+            console.log('Task ID:', taskId)
+            console.log('Current User:', currentUser)
+            
+            const content = document.getElementById('reviewContent').value.trim()
+            console.log('Content length:', content.length)
+            
+            if (!content) {
+                showNotification('Vui lòng nhập nội dung task review', 'error')
+                return
+            }
+            
+            // Show loading state
+            const saveBtn = document.querySelector('.save-btn')
+            const saveBtnText = document.getElementById('saveBtnText')
+            const saveSpinner = document.getElementById('saveSpinner')
+            
+            saveBtn.disabled = true
+            saveBtnText.textContent = 'Đang lưu...'
+            saveSpinner.classList.add('show')
+            
+            try {
+                console.log('Starting to save content...')
+                
+                // Lưu nội dung vào bảng task_content thay vì submission_link
+                // Sử dụng upsert với onConflict để xử lý trường hợp đã tồn tại
+                const { error: upsertError } = await supabase
+                    .from('task_content')
+                    .upsert({
+                        task_id: parseInt(taskId), // Đảm bảo task_id là INTEGER
+                        content_type: 'review',
+                        content: content,
+                        updated_at: new Date().toISOString()
+                    }, {
+                        onConflict: 'task_id,content_type'
+                    })
+                
+                console.log('Upsert result:', { error: upsertError })
+                
+                if (upsertError) throw upsertError
+                
+                // Cập nhật submission_link với một marker để biết có nội dung
+                const { error: updateError } = await supabase
+                    .from('tasks')
+                    .update({
+                        submission_link: '[CONTENT_SAVED]',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', taskId)
+                
+                if (updateError) throw updateError
+                
+                showNotification('Lưu nội dung task review thành công!', 'success')
+                
+                // Update save button text
+                saveBtnText.textContent = 'Đã lưu'
+                
+                // Tự động cập nhật số chữ tổng trong database
+                try {
+                    const wordCount = content.trim().split(/\s+/).length
+                    await supabase
+                        .from('tasks')
+                        .update({
+                            total_chars: wordCount
+                        })
+                        .eq('id', taskId)
+                    
+                    console.log(`Đã cập nhật số chữ tổng: ${wordCount}`)
+                } catch (updateError) {
+                    console.warn('Không thể cập nhật số chữ tổng:', updateError)
+                }
+                
+                // Redirect back after a short delay
+                setTimeout(() => goBack(), 1500)
+                
+            } catch (error) {
+                console.error('Error saving review content:', error)
+                showNotification('Lỗi lưu nội dung: ' + error.message, 'error')
+            } finally {
+                // Reset button state
+                saveBtn.disabled = false
+                saveBtnText.textContent = 'Lưu nội dung'
+                saveSpinner.classList.remove('show')
+            }
+        }
+        
+        function clearContent() {
+            if (confirm('Bạn có chắc chắn muốn xóa toàn bộ nội dung?')) {
+                document.getElementById('reviewContent').value = ''
+                updateWordCount()
+            }
+        }
+        
+        function updatePageTitle() {
+            let title = ''
+            let contentTitle = ''
+            
+            if (mode === 'view') {
+                title = 'Xem nội dung Review - Garden Moon'
+                contentTitle = 'Xem nội dung Review'
+            } else if (mode === 'edit') {
+                title = 'Chỉnh sửa nội dung Review - Garden Moon'
+                contentTitle = 'Chỉnh sửa nội dung Task Review'
+            } else {
+                title = 'Nhập nội dung Review - Garden Moon'
+                contentTitle = 'Nhập nội dung Review'
+            }
+            
+            document.title = title
+            
+            // Cập nhật tiêu đề nội dung nếu element đã tồn tại
+            const contentTitleEl = document.getElementById('contentTitle')
+            if (contentTitleEl) {
+                contentTitleEl.textContent = contentTitle
+            }
+        }
+        
+        function addCopyButton() {
+            // Thêm nút copy content vào sau textarea
+            const contentEditor = document.getElementById('reviewContent')
+            const copyButton = document.createElement('button')
+            copyButton.className = 'btn btn-outline-primary mt-3'
+            copyButton.innerHTML = '<i class="fas fa-copy me-2"></i>Copy nội dung'
+            copyButton.onclick = copyContentToClipboard
+            
+            // Chèn nút copy vào sau content editor
+            contentEditor.parentNode.insertBefore(copyButton, contentEditor.nextSibling)
+        }
+        
+        function copyContentToClipboard() {
+            const content = document.getElementById('reviewContent').value
+            if (content) {
+                navigator.clipboard.writeText(content).then(() => {
+                    showNotification('Đã copy nội dung vào clipboard!', 'success')
+                }).catch(() => {
+                    // Fallback cho các trình duyệt cũ
+                    const textArea = document.createElement('textarea')
+                    textArea.value = content
+                    document.body.appendChild(textArea)
+                    textArea.select()
+                    document.execCommand('copy')
+                    document.body.removeChild(textArea)
+                    showNotification('Đã copy nội dung vào clipboard!', 'success')
+                })
+            }
+        }
+        
+        function goBack() {
+            window.location.href = 'index.html'
+        }
+        
+        // Utility functions
+        function formatDateTime(dateString) {
+            const date = new Date(dateString)
+            return date.toLocaleString('vi-VN')
+        }
+        
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'Chờ thực hiện',
+                'in-progress': 'Đang thực hiện',
+                'completed': 'Hoàn thành',
+                'overdue': 'Quá hạn'
+            }
+            return statusMap[status] || status
+        }
+        
+        function getStatusBadgeClass(status) {
+            const classMap = {
+                'pending': 'bg-warning',
+                'in-progress': 'bg-info',
+                'completed': 'bg-success',
+                'overdue': 'bg-danger'
+            }
+            return classMap[status] || 'bg-secondary'
+        }
+        
+        function showNotification(message, type = 'info') {
+            const toast = document.getElementById('notificationToast')
+            const toastTitle = document.getElementById('toastTitle')
+            const toastMessage = document.getElementById('toastMessage')
+            
+            toastTitle.textContent = type === 'error' ? 'Lỗi' : 
+                                   type === 'success' ? 'Thành công' : 
+                                   type === 'warning' ? 'Cảnh báo' : 'Thông báo'
+            toastMessage.textContent = message
+            
+            toast.className = `toast toast-${type}`
+            
+            const bsToast = new bootstrap.Toast(toast)
+            bsToast.show()
+        }
+        
+        function debounce(func, wait) {
+            let timeout
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout)
+                    func(...args)
+                }
+                clearTimeout(timeout)
+                timeout = setTimeout(later, wait)
+            }
+        }
+        
+        async function autoSaveDraft() {
+            const content = document.getElementById('reviewContent').value.trim()
+            if (content) {
+                // Auto-save draft to localStorage
+                localStorage.setItem(`review_draft_${taskId}`, content)
+            }
+        }</script>
